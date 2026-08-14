@@ -355,6 +355,28 @@ def _apply_styles(ws):
 
 # ── UI ────────────────────────────────────────────────────────────────────────
 
+# Header: nama pembuat di kanan atas
+try:
+    from PIL import Image
+    import base64
+    img = Image.open("foto.jpg")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+    img_b64 = base64.b64encode(buf.getvalue()).decode()
+    foto_html = f'<img src="data:image/jpeg;base64,{img_b64}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #4F8BF9;">'
+except:
+    foto_html = '<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4F8BF9,#A855F7);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👤</div>'
+
+st.markdown(f"""
+<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:0.5rem;">
+    <div style="text-align:right;">
+        <div style="font-size:0.82rem;font-weight:700;color:#FAFAFA;line-height:1.3;">Rika Budi Arif Afianto A.Md.</div>
+        <div style="font-size:0.7rem;color:#718096;">Pembuat Aplikasi</div>
+    </div>
+    {foto_html}
+</div>
+""", unsafe_allow_html=True)
+
 # Hero
 st.markdown("""
 <div class="hero">

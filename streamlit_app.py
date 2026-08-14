@@ -370,8 +370,7 @@ except:
 st.markdown(f"""
 <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:0.5rem;">
     <div style="text-align:right;">
-        <div style="font-size:0.82rem;font-weight:700;color:#FAFAFA;line-height:1.3;">Rika Budi Arif Afianto A.Md.</div>
-        <div style="font-size:0.7rem;color:#718096;">Pembuat Aplikasi</div>
+        <div style="font-size:0.85rem;font-weight:700;color:#FAFAFA;letter-spacing:1px;">R1C4</div>
     </div>
     {foto_html}
 </div>

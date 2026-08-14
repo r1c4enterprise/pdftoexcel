@@ -368,11 +368,11 @@ except:
     foto_html = '<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4F8BF9,#A855F7);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👤</div>'
 
 st.markdown(f"""
-<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:0.5rem;">
-    <div style="text-align:right;">
-        <div style="font-size:0.85rem;font-weight:700;color:#FAFAFA;letter-spacing:1px;">R1C4</div>
-    </div>
+<div style="position:fixed;top:16px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;
+    background:#1E2130cc;backdrop-filter:blur(8px);border:1px solid #2D3748;
+    border-radius:99px;padding:6px 14px 6px 10px;">
     {foto_html}
+    <div style="font-size:0.85rem;font-weight:700;color:#FAFAFA;letter-spacing:1px;">R1C4</div>
 </div>
 """, unsafe_allow_html=True)
 

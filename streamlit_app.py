@@ -11,32 +11,213 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 import re
 import io
-
+import time
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="PDF to Excel Converter",
-    page_icon="📄",
+    page_title="PDF → Excel Converter",
+    page_icon="⚡",
     layout="centered",
+    initial_sidebar_state="collapsed",
 )
 
-# ── Custom CSS ────────────────────────────────────────────────────────────────
+# ── Inject CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    .main { max-width: 680px; margin: auto; }
-    .title { text-align: center; font-size: 2rem; font-weight: 700; color: #1a2340; }
-    .subtitle { text-align: center; color: #6b7280; margin-bottom: 2rem; }
-    .stDownloadButton > button {
-        width: 100%;
-        background-color: #4472C4;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-        border-radius: 10px;
-        padding: 0.6rem;
-        border: none;
-    }
-    .stDownloadButton > button:hover { background-color: #2F5496; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* { font-family: 'Inter', sans-serif; }
+
+/* Hide streamlit default elements */
+#MainMenu, footer, header { visibility: hidden; }
+.block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 760px; }
+
+/* Hero section */
+.hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+}
+.hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #4F8BF9, #A855F7);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 99px;
+    margin-bottom: 1.2rem;
+}
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    background: linear-gradient(135deg, #FFFFFF 0%, #A0AEC0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.hero-title span {
+    background: linear-gradient(135deg, #4F8BF9, #A855F7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.hero-sub {
+    color: #718096;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+/* Upload card */
+.upload-card {
+    background: linear-gradient(135deg, #1E2130 0%, #252A3D 100%);
+    border: 1px solid #2D3748;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.upload-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4F8BF9, #A855F7, #4F8BF9);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Stats row */
+.stats-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.stat-card {
+    flex: 1;
+    background: #1E2130;
+    border: 1px solid #2D3748;
+    border-radius: 14px;
+    padding: 1.2rem;
+    text-align: center;
+}
+.stat-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4F8BF9;
+    display: block;
+}
+.stat-label {
+    font-size: 0.75rem;
+    color: #718096;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Features */
+.features {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.feature-chip {
+    background: #1E2130;
+    border: 1px solid #2D3748;
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    color: #A0AEC0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Result card */
+.result-card {
+    background: linear-gradient(135deg, #0D2137, #1A1F35);
+    border: 1px solid #1E4D8C;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+.result-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #63B3ED;
+    margin-bottom: 1rem;
+}
+
+/* Divider */
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #2D3748, transparent);
+    margin: 2rem 0;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    color: #4A5568;
+    font-size: 0.78rem;
+    padding: 1.5rem 0 0;
+}
+
+/* Override streamlit upload button */
+[data-testid="stFileUploader"] {
+    border-radius: 12px;
+}
+[data-testid="stFileUploader"] > div {
+    border: 2px dashed #2D3748 !important;
+    border-radius: 12px !important;
+    background: #0F1117 !important;
+    transition: border-color 0.3s;
+}
+[data-testid="stFileUploader"] > div:hover {
+    border-color: #4F8BF9 !important;
+}
+
+/* Download button */
+[data-testid="stDownloadButton"] > button {
+    width: 100%;
+    background: linear-gradient(135deg, #4F8BF9, #7C3AED) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(79,139,249,0.3);
+}
+[data-testid="stDownloadButton"] > button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Progress */
+.stProgress > div > div {
+    background: linear-gradient(90deg, #4F8BF9, #A855F7) !important;
+    border-radius: 99px !important;
+}
+
+/* Success/error */
+.stAlert {
+    border-radius: 12px !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -51,11 +232,9 @@ def try_parse_number(value):
         return value
     negative = False
     if v.startswith("(") and v.endswith(")"):
-        v = v[1:-1]
-        negative = True
+        v = v[1:-1]; negative = True
     elif v.startswith("-"):
-        v = v[1:]
-        negative = True
+        v = v[1:]; negative = True
     v = re.sub(r"[Rp$€£¥\s]", "", v)
     if re.match(r"^\d{1,3}(\.\d{3})*(,\d+)?$", v):
         v = v.replace(".", "").replace(",", ".")
@@ -67,8 +246,7 @@ def try_parse_number(value):
         return value
     try:
         num = float(v)
-        if negative:
-            num = -num
+        if negative: num = -num
         return int(num) if num == int(num) else num
     except ValueError:
         return value
@@ -77,6 +255,7 @@ def try_parse_number(value):
 def extract_tables(pdf_bytes):
     results = []
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        total_pages = len(pdf.pages)
         for page_num, page in enumerate(pdf.pages, start=1):
             tables = page.extract_tables()
             if not tables:
@@ -102,6 +281,7 @@ def extract_tables(pdf_bytes):
                     "table_index": tbl_idx,
                     "headers": clean_header,
                     "rows": parsed_rows,
+                    "total_pages": total_pages,
                 })
     return results
 
@@ -181,39 +361,128 @@ def _apply_styles(ws):
 
 # ── UI ────────────────────────────────────────────────────────────────────────
 
-st.markdown('<div class="title">📄 PDF to Excel</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Upload laporan keuangan PDF, download hasilnya sebagai Excel.</div>', unsafe_allow_html=True)
+# Hero
+st.markdown("""
+<div class="hero">
+    <div class="hero-badge">⚡ PDF Converter</div>
+    <div class="hero-title">Ubah PDF jadi<br><span>Excel dalam detik</span></div>
+    <div class="hero-sub">
+        Upload laporan keuangan PDF kamu — semua tabel diekstrak otomatis,<br>
+        diformat rapi, dan siap pakai rumus Excel.
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Feature chips
+st.markdown("""
+<div class="features">
+    <div class="feature-chip">✅ Format angka otomatis</div>
+    <div class="feature-chip">🎨 Styling Excel rapi</div>
+    <div class="feature-chip">📊 Multi-tabel</div>
+    <div class="feature-chip">🔢 Siap rumus SUM/AVERAGE</div>
+    <div class="feature-chip">🆓 Gratis</div>
+</div>
+""", unsafe_allow_html=True)
+
+# Upload card
+st.markdown('<div class="upload-card">', unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader(
-    "Pilih file PDF",
+    "📂 Drag & drop PDF di sini atau klik untuk browse",
     type=["pdf"],
-    help="Maksimal 200MB"
+    label_visibility="visible",
 )
 
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Jika file diupload
 if uploaded_file:
-    st.info(f"📎 **{uploaded_file.name}** ({uploaded_file.size / 1024 / 1024:.2f} MB)")
+    file_size = uploaded_file.size / 1024 / 1024
 
-    if st.button("⚡ Konversi ke Excel", use_container_width=True):
-        with st.spinner("Memproses PDF... mohon tunggu"):
-            try:
-                pdf_bytes = uploaded_file.read()
-                tables    = extract_tables(pdf_bytes)
+    # Info file
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div class="stat-card">
+            <div class="stat-icon">�</div>
+            <span class="stat-value">PDF</span>
+            <span class="stat-label">Format</span>
+        </div>""", unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div class="stat-card">
+            <div class="stat-icon">💾</div>
+            <span class="stat-value">{file_size:.1f} MB</span>
+            <span class="stat-label">Ukuran</span>
+        </div>""", unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div class="stat-card">
+            <div class="stat-icon">📎</div>
+            <span class="stat-value" style="font-size:0.85rem">{uploaded_file.name[:16]}...</span>
+            <span class="stat-label">File</span>
+        </div>""", unsafe_allow_html=True)
 
-                if not tables:
-                    st.error("❌ Tidak ada tabel yang ditemukan di PDF ini.")
-                else:
-                    excel_bytes = build_excel(tables)
-                    output_name = uploaded_file.name.replace(".pdf", ".xlsx")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-                    st.success(f"✅ Berhasil! Ditemukan **{len(tables)} tabel** dari PDF.")
+    if st.button("⚡ Konversi ke Excel Sekarang", use_container_width=True, type="primary"):
+        progress = st.progress(0, text="Membaca file PDF...")
+        time.sleep(0.3)
 
-                    st.download_button(
-                        label="📥 Download Excel",
-                        data=excel_bytes,
-                        file_name=output_name,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        use_container_width=True,
-                    )
+        try:
+            pdf_bytes = uploaded_file.read()
+            progress.progress(20, text="Mengekstrak tabel...")
 
-            except Exception as e:
-                st.error(f"❌ Terjadi kesalahan: {str(e)}")
+            tables = extract_tables(pdf_bytes)
+            progress.progress(60, text="Memformat data...")
+
+            if not tables:
+                progress.empty()
+                st.error("❌ Tidak ada tabel yang ditemukan di PDF ini. Pastikan PDF bukan hasil scan.")
+            else:
+                excel_bytes = build_excel(tables)
+                progress.progress(90, text="Menyiapkan file Excel...")
+                time.sleep(0.3)
+                progress.progress(100, text="Selesai!")
+                time.sleep(0.4)
+                progress.empty()
+
+                # Hitung total baris data
+                total_rows = sum(len(t["rows"]) for t in tables)
+                total_pages = tables[-1]["total_pages"] if tables else 0
+
+                # Stats hasil
+                st.markdown('<div class="result-card">', unsafe_allow_html=True)
+                st.markdown('<div class="result-title">🎉 Konversi berhasil!</div>', unsafe_allow_html=True)
+
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    st.metric("📊 Tabel", len(tables))
+                with c2:
+                    st.metric("📄 Halaman", total_pages)
+                with c3:
+                    st.metric("📝 Baris Data", total_rows)
+
+                st.markdown("<br>", unsafe_allow_html=True)
+
+                output_name = uploaded_file.name.replace(".pdf", ".xlsx")
+                st.download_button(
+                    label="📥 Download Excel Sekarang",
+                    data=excel_bytes,
+                    file_name=output_name,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True,
+                )
+                st.markdown('</div>', unsafe_allow_html=True)
+
+        except Exception as e:
+            progress.empty()
+            st.error(f"❌ Terjadi kesalahan: {str(e)}")
+
+# Divider & footer
+st.markdown("""
+<div class="divider"></div>
+<div class="footer">
+    Dibuat dengan ❤️ menggunakan Python & Streamlit &nbsp;·&nbsp; pdfplumber + openpyxl
+</div>
+""", unsafe_allow_html=True)

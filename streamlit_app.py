@@ -497,6 +497,6 @@ if uploaded_file:
 st.markdown("""
 <div class="divider"></div>
 <div class="footer">
-    Dibuat dengan ❤️ menggunakan Python & Streamlit &nbsp;·&nbsp; pdfplumber + openpyxl
+    © 2026 r1c4enterprise · All Rights Reserved
 </div>
 """, unsafe_allow_html=True)

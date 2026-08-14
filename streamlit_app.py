@@ -35,7 +35,7 @@ st.markdown("""
 /* Hero section */
 .hero {
     text-align: center;
-    padding: 3rem 1rem 2rem;
+    padding: 2rem 1rem 2rem;
 }
 .hero-badge {
     display: inline-block;
@@ -50,16 +50,13 @@ st.markdown("""
     margin-bottom: 1.2rem;
 }
 .hero-title {
-    font-size: 3rem;
+    font-size: 2.8rem;
     font-weight: 800;
     line-height: 1.15;
     margin: 0 0 1rem;
-    background: linear-gradient(135deg, #FFFFFF 0%, #A0AEC0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #FAFAFA;
 }
-.hero-title span {
+.gradient-text {
     background: linear-gradient(135deg, #4F8BF9, #A855F7);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -69,69 +66,17 @@ st.markdown("""
     color: #718096;
     font-size: 1rem;
     font-weight: 400;
-    margin-bottom: 2.5rem;
-    line-height: 1.6;
-}
-
-/* Upload card */
-.upload-card {
-    background: linear-gradient(135deg, #1E2130 0%, #252A3D 100%);
-    border: 1px solid #2D3748;
-    border-radius: 20px;
-    padding: 2.5rem 2rem;
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-}
-.upload-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #4F8BF9, #A855F7, #4F8BF9);
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
-}
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-/* Stats row */
-.stats-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-.stat-card {
-    flex: 1;
-    background: #1E2130;
-    border: 1px solid #2D3748;
-    border-radius: 14px;
-    padding: 1.2rem;
-    text-align: center;
-}
-.stat-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #4F8BF9;
-    display: block;
-}
-.stat-label {
-    font-size: 0.75rem;
-    color: #718096;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    margin-bottom: 2rem;
+    line-height: 1.7;
 }
 
 /* Features */
 .features {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
+    justify-content: center;
 }
 .feature-chip {
     background: #1E2130;
@@ -140,14 +85,53 @@ st.markdown("""
     padding: 6px 14px;
     font-size: 0.78rem;
     color: #A0AEC0;
+}
+
+/* Glow divider */
+.glow-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4F8BF9, #A855F7, transparent);
+    margin: 1.5rem 0;
+    border-radius: 99px;
+}
+
+/* Upload label */
+.upload-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #A0AEC0;
+    margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+}
+
+/* Stats row */
+.stat-card {
+    background: #1E2130;
+    border: 1px solid #2D3748;
+    border-radius: 14px;
+    padding: 1.2rem;
+    text-align: center;
+}
+.stat-icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #4F8BF9;
+    display: block;
+}
+.stat-label {
+    font-size: 0.7rem;
+    color: #718096;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Result card */
 .result-card {
-    background: linear-gradient(135deg, #0D2137, #1A1F35);
+    background: linear-gradient(135deg, #0D1B2A, #1A1F35);
     border: 1px solid #1E4D8C;
     border-radius: 16px;
     padding: 1.5rem;
@@ -160,63 +144,73 @@ st.markdown("""
     margin-bottom: 1rem;
 }
 
-/* Divider */
-.divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #2D3748, transparent);
-    margin: 2rem 0;
-}
-
 /* Footer */
 .footer {
     text-align: center;
     color: #4A5568;
     font-size: 0.78rem;
-    padding: 1.5rem 0 0;
+    padding: 2rem 0 0;
 }
 
 /* Override streamlit upload button */
-[data-testid="stFileUploader"] {
-    border-radius: 12px;
-}
 [data-testid="stFileUploader"] > div {
     border: 2px dashed #2D3748 !important;
-    border-radius: 12px !important;
-    background: #0F1117 !important;
+    border-radius: 14px !important;
+    background: #1A1F2E !important;
     transition: border-color 0.3s;
 }
 [data-testid="stFileUploader"] > div:hover {
     border-color: #4F8BF9 !important;
+    background: #1E2538 !important;
+}
+
+/* Primary button */
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #4F8BF9, #7C3AED) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 20px rgba(79,139,249,0.35) !important;
+    transition: transform 0.15s, box-shadow 0.15s !important;
+}
+.stButton > button[kind="primary"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(79,139,249,0.5) !important;
 }
 
 /* Download button */
 [data-testid="stDownloadButton"] > button {
-    width: 100%;
-    background: linear-gradient(135deg, #4F8BF9, #7C3AED) !important;
+    width: 100% !important;
+    background: linear-gradient(135deg, #059669, #0D9488) !important;
     color: white !important;
     border: none !important;
     border-radius: 12px !important;
-    padding: 0.75rem 1.5rem !important;
     font-size: 1rem !important;
     font-weight: 600 !important;
-    letter-spacing: 0.3px;
-    transition: opacity 0.2s, transform 0.1s;
-    box-shadow: 0 4px 20px rgba(79,139,249,0.3);
+    box-shadow: 0 4px 20px rgba(5,150,105,0.35) !important;
 }
 [data-testid="stDownloadButton"] > button:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(5,150,105,0.5) !important;
 }
 
-/* Progress */
-.stProgress > div > div {
+/* Progress bar */
+.stProgress > div > div > div {
     background: linear-gradient(90deg, #4F8BF9, #A855F7) !important;
     border-radius: 99px !important;
 }
 
-/* Success/error */
-.stAlert {
-    border-radius: 12px !important;
+/* Metric */
+[data-testid="stMetric"] {
+    background: #1E2130;
+    border: 1px solid #2D3748;
+    border-radius: 12px;
+    padding: 1rem !important;
+}
+[data-testid="stMetricValue"] {
+    color: #4F8BF9 !important;
+    font-weight: 700 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -365,11 +359,11 @@ def _apply_styles(ws):
 st.markdown("""
 <div class="hero">
     <div class="hero-badge">⚡ PDF Converter</div>
-    <div class="hero-title">Ubah PDF jadi<br><span>Excel dalam detik</span></div>
-    <div class="hero-sub">
-        Upload laporan keuangan PDF kamu — semua tabel diekstrak otomatis,<br>
+    <h1 class="hero-title">Ubah PDF jadi<br><span class="gradient-text">Excel dalam detik</span></h1>
+    <p class="hero-sub">
+        Upload laporan keuangan PDF — semua tabel diekstrak otomatis,<br>
         diformat rapi, dan siap pakai rumus Excel.
-    </div>
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -378,22 +372,20 @@ st.markdown("""
 <div class="features">
     <div class="feature-chip">✅ Format angka otomatis</div>
     <div class="feature-chip">🎨 Styling Excel rapi</div>
-    <div class="feature-chip">📊 Multi-tabel</div>
+    <div class="feature-chip">📊 Multi-tabel & Multi-halaman</div>
     <div class="feature-chip">🔢 Siap rumus SUM/AVERAGE</div>
-    <div class="feature-chip">🆓 Gratis</div>
+    <div class="feature-chip">🆓 100% Gratis</div>
 </div>
+<div class="glow-line"></div>
 """, unsafe_allow_html=True)
 
-# Upload card
-st.markdown('<div class="upload-card">', unsafe_allow_html=True)
-
+# Upload
+st.markdown('<p class="upload-label">📂 Upload File PDF</p>', unsafe_allow_html=True)
 uploaded_file = st.file_uploader(
-    "📂 Drag & drop PDF di sini atau klik untuk browse",
+    "Drag & drop PDF di sini atau klik untuk browse",
     type=["pdf"],
-    label_visibility="visible",
+    label_visibility="collapsed",
 )
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 # Jika file diupload
 if uploaded_file:

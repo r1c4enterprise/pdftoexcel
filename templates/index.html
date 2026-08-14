@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF to Excel Converter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .icon { font-size: 56px; margin-bottom: 12px; }
+
+    h1 {
+      font-size: 24px;
+      color: #1a2340;
+      margin-bottom: 6px;
+    }
+
+    p.subtitle {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed #4472C4;
+      border-radius: 12px;
+      padding: 36px 20px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      background: #eef3fb;
+      border-color: #2F5496;
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-zone .dz-icon { font-size: 36px; margin-bottom: 8px; }
+
+    .drop-zone .dz-text {
+      color: #4472C4;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .drop-zone .dz-hint {
+      color: #9ca3af;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .file-name {
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 20px;
+      min-height: 20px;
+      font-weight: 500;
+    }
+
+    /* Button */
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #4472C4;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:hover:not(:disabled) { background: #2F5496; }
+    button:active:not(:disabled) { transform: scale(0.98); }
+    button:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    /* Progress */
+    .progress-wrap {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .progress-bar-bg {
+      background: #e5e7eb;
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: linear-gradient(90deg, #4472C4, #7ec8e3);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.3s;
+      animation: indeterminate 1.2s infinite linear;
+    }
+
+    @keyframes indeterminate {
+      0%   { margin-left: -40%; width: 40%; }
+      100% { margin-left: 100%; width: 40%; }
+    }
+
+    .progress-text {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* Status */
+    .status {
+      margin-top: 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: none;
+    }
+
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+      display: block;
+    }
+
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📄</div>
+    <h1>PDF to Excel</h1>
+    <p class="subtitle">Upload laporan keuangan PDF, download hasilnya sebagai Excel.</p>
+
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".pdf" />
+      <div class="dz-icon">📂</div>
+      <div class="dz-text">Klik atau drag & drop PDF di sini</div>
+      <div class="dz-hint">Hanya file .pdf • Maks 20MB</div>
+    </div>
+
+    <div class="file-name" id="fileName">Belum ada file dipilih</div>
+
+    <button id="convertBtn" disabled onclick="convertPdf()">
+      <span>⚡</span> Konversi ke Excel
+    </button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-text" id="progressText">Memproses PDF...</div>
+    </div>
+
+    <div class="status" id="statusBox"></div>
+  </div>
+
+  <script>
+    const fileInput   = document.getElementById("fileInput");
+    const dropZone    = document.getElementById("dropZone");
+    const fileName    = document.getElementById("fileName");
+    const convertBtn  = document.getElementById("convertBtn");
+    const progressWrap= document.getElementById("progressWrap");
+    const progressText= document.getElementById("progressText");
+    const statusBox   = document.getElementById("statusBox");
+
+    // File input change
+    fileInput.addEventListener("change", () => {
+      handleFile(fileInput.files[0]);
+    });
+
+    // Drag & drop
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        fileInput.files = e.dataTransfer.files;
+        handleFile(file);
+      }
+    });
+
+    function handleFile(file) {
+      if (!file) return;
+      if (!file.name.toLowerCase().endsWith(".pdf")) {
+        showStatus("error", "❌ Hanya file PDF yang diterima.");
+        return;
+      }
+      fileName.textContent = `📎 ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
+      convertBtn.disabled = false;
+      statusBox.className = "status";
+      statusBox.style.display = "none";
+    }
+
+    async function convertPdf() {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // UI: loading state
+      convertBtn.disabled = true;
+      progressWrap.style.display = "block";
+      progressText.textContent = "Mengupload dan memproses PDF...";
+      statusBox.className = "status";
+      statusBox.style.display = "none";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("/convert-download", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || "Terjadi kesalahan di server.");
+        }
+
+        // Download file Excel
+        const blob = await response.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement("a");
+        a.href     = url;
+        a.download = file.name.replace(".pdf", ".xlsx");
+        a.click();
+        URL.revokeObjectURL(url);
+
+        showStatus("success", "✅ Berhasil! File Excel sedang didownload.");
+      } catch (err) {
+        showStatus("error", "❌ " + err.message);
+      } finally {
+        progressWrap.style.display = "none";
+        convertBtn.disabled = false;
+      }
+    }
+
+    function showStatus(type, msg) {
+      statusBox.className = "status " + type;
+      statusBox.textContent = msg;
+      statusBox.style.display = "block";
+    }
+  </script>
+</body>
+</html>
